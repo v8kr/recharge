@@ -1,0 +1,2 @@
+truncate `city`;
+truncate `province`
