@@ -1,0 +1,13 @@
+DROP TABLE `users`;
+DROP TABLE `sale_account`;
+DROP TABLE `sale_account_logs`;
+DROP TABLE `province`;
+DROP TABLE `city`;
+DROP TABLE `products`;
+DROP TABLE `sale_products`;
+DROP TABLE `supplier_products`;
+DROP TABLE `supplier_config`;
+DROP TABLE `flow_orders`;
+DROP TABLE `flow_order_commit`;
+DROP TABLE `callback_user`;
+DROP TABLE `supplier_callback`;
