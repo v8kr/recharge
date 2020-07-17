@@ -1,3 +1,18 @@
+# 使用方法
+
+使用 [migrate](https://github.com/golang-migrate/migrate)
+
+```shell
+//创建迁移文件
+migrate create -ext sql -dir database/migrates/ -seq base_data
+
+//执行迁移
+migrate -path database/migrates/ --database "mysql://root:xxx@tcp(127.0.0.1:3306)/recharge" up
+
+//回退 要指定版本号 不然全部回退
+migrate -path database/migrates/ --database "mysql://root:xxx@tcp(127.0.0.1:3306)/recharge" down 2
+```
+
 # 字段说明
 
 ## 表：flow_orders
