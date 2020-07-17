@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -66,4 +67,10 @@ func Debug() bool {
 
 func DefaultNotifyEmail() []string {
 	return Cfg.Notify.Email.Default
+}
+
+func GetDNS() string {
+	mysql := Cfg.Mysql
+	return fmt.Sprintf("%v:%v@(%v:%v)/%v?charset=utf8mb4&parseTime=true&loc=Local",
+		mysql.Username, mysql.Password, mysql.Host, mysql.Port, mysql.Database)
 }
