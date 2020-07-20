@@ -1,0 +1,22 @@
+env: production
+debug: false
+
+mysql:
+  host: 127.0.0.1
+  username: root
+  password: xxx
+  database: recharge
+  port: 3306
+
+notify:
+  email:
+    host: mail.xxx.com
+    port: 25
+    username:
+    password:
+    from: xxx@xxx.com
+    default: [ xxx@xx.com ]
+  alertover:
+    source:
+    receiver:
+
