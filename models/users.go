@@ -1,5 +1,10 @@
 package models
 
+import (
+	"database/sql"
+	"strings"
+)
+
 type User struct {
 	Model
 	UserName    string
@@ -13,7 +18,7 @@ type User struct {
 	ApiToken    string
 	ApiId       string
 	Secret      string
-	AllowIp     string
+	AllowIp     sql.NullString
 	NotifyUrl   string
 	PriceLimit  uint8
 	HiddenError uint8
@@ -25,3 +30,11 @@ const (
 	USER_STATUS_WAIT_CHECK = "wait_check"
 	USER_STATUS_FORBIDDEN  = "forbidden"
 )
+
+func (u User) IsActive() bool {
+	return u.Status == USER_STATUS_ACTIVE
+}
+
+func (u User) IsAllowIP(ip string) bool {
+	return u.AllowIp.Valid == true && strings.Index(u.AllowIp.String, ip) > -1
+}
