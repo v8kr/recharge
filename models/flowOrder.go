@@ -17,6 +17,7 @@ type FlowOrder struct {
 	SupplierPrice     float32 // '交易时上游给的价格',
 	NotifyUrl         string  // '下游提供的回调URL',
 	Status            string  // '订单状态',
+	Ip                string  // 提单ip
 	SupplierError     string  // '上游错误代码和描述',
 	CallbackError     string  // '回调下游错误描述',
 	ErrorCode         string  // '平台错误代码',
