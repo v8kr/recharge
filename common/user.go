@@ -9,7 +9,7 @@ import (
 // check status and allow ip
 func ApiLoadUser(apiId string, ip string) (models.User, error) {
 	var user models.User
-	if err := models.DB.Where("api_id", apiId).First(&user).Error; err != nil {
+	if err := models.DB.Where("api_id = ?", apiId).First(&user).Error; err != nil {
 		return user, errors.New("not found user")
 	}
 

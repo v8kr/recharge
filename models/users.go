@@ -36,5 +36,9 @@ func (u User) IsActive() bool {
 }
 
 func (u User) IsAllowIP(ip string) bool {
-	return u.AllowIp.Valid == true && strings.Index(u.AllowIp.String, ip) > -1
+	if u.AllowIp.Valid == false {
+		return true
+	} else {
+		return strings.Index(u.AllowIp.String, ip) > -1
+	}
 }

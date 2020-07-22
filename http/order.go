@@ -42,6 +42,18 @@ func commit(c *gin.Context) {
 		return
 	}
 
+	p := common.LoadProduct(commitRequest.ProductId, user.ID)
+
+	fmt.Printf("%+v", p)
+
+	if p.Product.ID <= 0 {
+		c.JSON(422, gin.H{
+			"code": 422,
+			"msg":  "产品编码错误或未配置，请联系运营配置。",
+		})
+		return
+	}
+
 	c.String(200, fmt.Sprintf("commit order %+v", user))
 
 }
