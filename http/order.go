@@ -8,21 +8,9 @@ import (
 	"github.com/v8kr/recharge/models"
 )
 
-type CommitRequest struct {
-	Uid       string `form:"uid" binding:"required,alphanum,max=32,min=32"`
-	OrderId   string `form:"order_id" binding:"required,alphanum,max=32,min=1"`
-	ProductId string `form:"product_id" binding:"required,alphanum"`
-	Amount    uint16 `form:"amount" binding:"required,numeric"`
-	Cellphone string `form:"cellphone" binding:"required,numeric,min=11,max=11"`
-	Operator  string `form:"operator" binding:"required,alpha"`
-	Time      string `form:"time" binding:"required"`
-	NotifyUrl string `form:"notify_url" binding:"required,url"`
-	Sign      string `form:"sign" binding:"required,hexadecimal,min=40,max=40"`
-}
-
 func commit(c *gin.Context) {
 
-	var commitRequest CommitRequest
+	var commitRequest common.ApiFlowParams
 
 	if e := c.ShouldBind(&commitRequest); e != nil {
 		c.JSON(422, gin.H{
@@ -31,10 +19,13 @@ func commit(c *gin.Context) {
 		})
 		return
 	}
+	commitRequest.Ip = c.ClientIP()
+
 	l := logger.Get("flow-commit")
 	l.Info(fmt.Sprintf("%+v", commitRequest))
 
-	user, err := common.ApiLoadUser(commitRequest.Uid, c.ClientIP())
+	user, err := models.ApiLoadUser(commitRequest.Uid, commitRequest.Ip)
+
 	if err != nil {
 		c.JSON(422, gin.H{
 			"code": 422,
@@ -43,8 +34,18 @@ func commit(c *gin.Context) {
 		return
 	}
 
-	p := common.LoadProduct(commitRequest.ProductId, user.ID)
+	if order, exists := commitRequest.UserOrderExists(user.ID); exists {
+		c.JSON(200, gin.H{
+			"code":         200,
+			"msg":          "订单已存在。",
+			"order_status": order.Status,
+			"bill_no":      order.OrderId,
+			"order_id":     order.UserOrderId,
+		})
+		return
+	}
 
+	p := models.LoadProduct(commitRequest.ProductId, user.ID)
 	if p.Product.ID <= 0 {
 		c.JSON(422, gin.H{
 			"code": 422,
@@ -59,10 +60,21 @@ func commit(c *gin.Context) {
 			"code": 422,
 			"msg":  "不支持的号段或号码与产品归属不一致。",
 		})
+		return
 	}
 
-	c.String(200, fmt.Sprintf("commit order %+v", user))
+	commitRequest.CellphoneInfo = cellphone
 
+	order, err := commitRequest.Trade(&user, &p)
+	if err != nil {
+		c.JSON(422, gin.H{
+			"code": 422,
+			"msg":  fmt.Sprintf("%s", err),
+		})
+		return
+	}
+
+	c.String(200, fmt.Sprintf("commit order \r\n%+v", order))
 }
 
 func query(c *gin.Context) {

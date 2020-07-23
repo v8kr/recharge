@@ -6,10 +6,10 @@ type FlowOrder struct {
 	UserOrderId       string // '分销商的订单号',
 	SupplierOrderId   string // '上游的订单号',
 	SupplierId        string // '使用上游的标识符',
-	UserId            int
-	AccountId         int
-	ProductId         int     // 'products id',
-	SaleProductId     int     // 'sale_products id',
+	UserId            uint
+	AccountId         uint
+	ProductId         uint    // 'products id',
+	SaleProductId     uint    // 'sale_products id',
 	SupplierProductId int     // 'supplier_product id',
 	Tel               string  // '充值的手机号',
 	ProductValue      int     // '充值的流量值 M',
@@ -25,8 +25,8 @@ type FlowOrder struct {
 	PayType           uint8   // '支付类型0account 1第三方支付',
 	PayId             int     //'支付ID sale_account_logs id  pay_order id',
 	Operator          string  // '运营商CM CT CU',
-	ProvinceId        int     // '号码归属省',
-	CityId            int     // '号码归属市',
+	ProvinceId        uint8   // '号码归属省',
+	CityId            uint16  // '号码归属市',
 	Source            string  //'订单来源',
 }
 

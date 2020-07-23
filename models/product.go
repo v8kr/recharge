@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 type Product struct {
 	Model
 	ProductId    string  // '自定义产品ID',
@@ -14,4 +16,25 @@ type Product struct {
 	ValidDate    uint8  // '有效期 流量-1跨月0当月其他值天数 话费0',
 	Detail       string // '详细描述',
 	SoftDelete
+}
+
+type FlowProduct struct {
+	Product
+	SaleProduct
+}
+
+func LoadProduct(productId string, userId uint) FlowProduct {
+
+	var product FlowProduct
+
+	db := DB.Table("products").Select("products.*,sale_products.*")
+	db = db.Joins("left join sale_products on products.id = sale_products.product_id")
+	db = db.Where("products.product_id = ?", productId).Where("sale_products.user_id = ?", userId)
+
+	err := db.First(&product).Error
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return product
 }

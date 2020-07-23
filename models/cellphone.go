@@ -26,7 +26,7 @@ func GetCellphone(cellphone string) (Cellphone, error) {
 		return c, errors.New("cellphone error")
 	}
 
-	id := strings.Split(cellphone, "")[:6]
+	id := strings.Join(strings.Split(cellphone, "")[:7], "")
 	err := DB.Where("id = ?", id).First(&c).Error
 	if err != nil || c.ProvinceId == 0 || c.CityId == 0 {
 		return c, errors.New("不支持的号段")
