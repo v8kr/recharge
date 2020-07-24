@@ -34,6 +34,15 @@ func commit(c *gin.Context) {
 		return
 	}
 
+	err = commitRequest.CheckSign(c, user.Secret)
+	if err != nil {
+		c.JSON(422, gin.H{
+			"code": 422,
+			"msg":  fmt.Sprintf("%s", err),
+		})
+		return
+	}
+
 	if order, exists := commitRequest.UserOrderExists(user.ID); exists {
 		c.JSON(200, gin.H{
 			"code":         200,

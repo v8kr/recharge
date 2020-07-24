@@ -2,12 +2,33 @@ package common
 
 import (
 	"errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/v8kr/recharge/models"
+	"reflect"
+	"regexp"
+	"sort"
+	"strings"
 )
 
 type Trades interface {
 	Trade(user *models.User, product *models.FlowProduct) (models.FlowOrder, error)
+}
+
+var SignFields NSort
+
+func init() {
+	t := reflect.TypeOf(ApiBaseParams{})
+	for i := 0; i < t.NumField(); i++ {
+		tagName := t.Field(i).Tag.Get("form")
+		if tagName == "-" || tagName == "sign" {
+			continue
+		}
+		SignFields = append(SignFields, tagName)
+	}
+	SignFields = append(SignFields, "secret")
+	sort.Sort(SignFields)
 }
 
 type ApiBaseParams struct {
@@ -27,6 +48,26 @@ type ApiBaseParams struct {
 
 type ApiFlowParams struct {
 	ApiBaseParams
+}
+
+func (params ApiBaseParams) CheckSign(c *gin.Context, secret string) error {
+	rawStr := ""
+	for _, name := range SignFields {
+		if name == "secret" {
+			rawStr += name + "=" + secret + "&"
+		} else {
+			rawStr += name + "=" + c.PostForm(name) + "&"
+		}
+	}
+	rawStr = strings.Trim(rawStr, "&")
+	okSign := GetSha1(rawStr)
+	if okSign != params.Sign {
+		r := regexp.MustCompile(`(&secret=\w{5})\w+`)
+		rawStr = r.ReplaceAllString(rawStr, "$1...")
+		return errors.New(fmt.Sprintf("sign error. right sign: %s. raw str: %s", okSign, rawStr))
+	} else {
+		return nil
+	}
 }
 
 func (params *ApiBaseParams) Trade(user *models.User, product *models.FlowProduct) (models.FlowOrder, error) {
